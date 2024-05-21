@@ -1,32 +1,30 @@
-
-import dynamic from "next/dynamic";
+import Pagination from "@/components/Pagination";
+import Table from "@/components/Table";
+import Link from "next/link";
 import { Suspense } from "react";
-const TableComponent = dynamic(() => import('@/components/Table'), {
-  ssr: false,loading: () => <>Loading</>,
-})
-
+export const dynamic = "force-dynamic";
+import { v4 as uuid} from 'uuid';
 export default async function Home({
   searchParams,
 }: {
   searchParams: { page: string };
 }) {
-  const response = await fetch(
-    `http://localhost:3000/?page=${searchParams.page}`
-  );
-  const data = await response.json();
-  const currentPage = (searchParams.page as string) || "1";
-  const tableData = data.data;
-  const totalPages = data.totalPages;
+  const page = parseInt(searchParams.page);
 
   return (
-    <>
-      <Suspense fallback={<>Loading</>}>
-        <TableComponent
-          currentPage={currentPage}
-          totalPages={totalPages}
-          data={tableData}
-        ></TableComponent>
+    <div key={uuid()}>
+      <h1>Home</h1>
+      <Link
+        href={{
+          pathname: "/",
+          query: { page: page > 1 ? page + 1 : 1 },
+        }}
+      >
+        Next
+      </Link>
+      <Suspense fallback={"...loading"}>
+        <Table currentPage={page}></Table>
       </Suspense>
-    </>
+    </div>
   );
 }
